@@ -1,0 +1,673 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Code Assistant</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ========================= -->
+    <!-- Navigation -->
+    <!-- ========================= -->
+
+    <div class="navbar">
+
+        <div class="logo">
+            🤖 AI Code Assistant
+        </div>
+
+        <div class="nav-links">
+
+            <a href="#generate">
+                Generate
+            </a>
+
+            <a href="#explain">
+                Explain
+            </a>
+
+            <a href="#debug">
+                Debug
+            </a>
+
+            <a href="#tests">
+                Test Cases
+            </a>
+
+            <a href="#about">
+                About
+            </a>
+
+            <a href="#how-it-works">
+                How It Works
+            </a>
+
+            <button type="button" onclick="toggleDarkMode()">
+                🌙 Dark Mode
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- Main Heading -->
+    <!-- ========================= -->
+
+    <h1>
+        🤖 AI-Powered Code Assistant
+    </h1>
+
+    <p>
+        Generate, explain, debug and test programming code easily.
+    </p>
+
+
+    <!-- ========================= -->
+    <!-- Feature Cards -->
+    <!-- ========================= -->
+
+    <div class="feature-cards">
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                💻
+            </div>
+
+            <h3>
+                Code Generation
+            </h3>
+
+            <p>
+                Generate Python, Java and C++ programs.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                📖
+            </div>
+
+            <h3>
+                Code Explanation
+            </h3>
+
+            <p>
+                Understand programming code in simple language.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🐞
+            </div>
+
+            <h3>
+                Code Debugging
+            </h3>
+
+            <p>
+                Find Python syntax errors quickly.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🧪
+            </div>
+
+            <h3>
+                Test Cases
+            </h3>
+
+            <p>
+                Generate useful test cases for programs.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- ========================= -->
+    <!-- Generate Code -->
+    <!-- ========================= -->
+
+    <h2 id="generate">
+        💻 Generate Code
+    </h2>
+
+    <form method="POST">
+
+        <label for="language">
+            <strong>Select Programming Language:</strong>
+        </label>
+
+        <br><br>
+
+        <select id="language" name="language">
+
+            <option value="python"
+                {% if language == "python" %}selected{% endif %}>
+                🐍 Python
+            </option>
+
+            <option value="java"
+                {% if language == "java" %}selected{% endif %}>
+                ☕ Java
+            </option>
+
+            <option value="cpp"
+                {% if language == "cpp" %}selected{% endif %}>
+                💻 C++
+            </option>
+
+        </select>
+
+        <br><br>
+
+        <textarea
+            name="question"
+            rows="8"
+            placeholder="Example: Write a program to check whether a number is even or odd">{{ question }}</textarea>
+
+        <br><br>
+
+        <div class="generate-actions">
+
+    <button type="submit">
+        🚀 Generate Code
+    </button>
+
+    <button type="reset">
+        🗑️ Clear
+    </button>
+
+    <button type="button" onclick="resetAll()">
+        🔄 Reset All
+    </button>
+
+</div>
+
+    </form>
+
+
+    <!-- ========================= -->
+    <!-- Generated Code -->
+    <!-- ========================= -->
+
+    {% if answer %}
+
+    <div class="success-message">
+    ✅ Code generated successfully!
+</div>
+
+    <h2>
+    💻 Generated Code
+    {% if language %}
+        <span class="language-badge">{{ language|upper }}</span>
+    {% endif %}
+</h2>
+
+    <div class="code-container">
+
+        <div class="code-actions">
+
+    <button type="button" onclick="copyCode()">
+        📋 Copy Code
+    </button>
+
+    <form method="POST" action="/download">
+        <input type="hidden" name="code" value="{{ answer }}">
+        <input type="hidden" name="language" value="{{ language }}">
+
+        <button type="submit">
+            ⬇️ Download Code
+        </button>
+    </form>
+
+</div>
+
+        <pre id="generatedCode">{{ answer }}</pre>
+
+    </div>
+
+
+    <!-- Download Code -->
+
+    <form method="POST" action="/download">
+
+        <input
+            type="hidden"
+            name="code"
+            value="{{ answer }}">
+
+        <input
+            type="hidden"
+            name="language"
+            value="{{ language }}">
+
+        <button
+            type="submit"
+            class="download-button">
+
+            ⬇️ Download Code
+
+        </button>
+
+    </form>
+
+    {% endif %}
+
+
+    <!-- ========================= -->
+    <!-- Explanation -->
+    <!-- ========================= -->
+
+    <hr>
+
+    <h2 id="explain">
+        📖 Explain Code
+    </h2>
+
+    <form method="POST">
+
+        <textarea
+            name="code_to_explain"
+            rows="8"
+            placeholder="Paste your code here to get an explanation..."></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            📖 Explain Code
+        </button>
+
+    </form>
+
+
+    {% if code_explanation %}
+
+    <div class="explanation-container">
+
+        <button
+            type="button"
+            class="copy-explanation-button"
+            onclick="copyExplanation()">
+
+            📋 Copy
+
+        </button>
+
+        <pre id="explanationText">{{ code_explanation }}</pre>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ========================= -->
+    <!-- Debug Code -->
+    <!-- ========================= -->
+
+    <hr>
+
+    <h2 id="debug">
+        🐞 Debug Code
+    </h2>
+
+    <p>
+        🔹 Currently supports
+        <strong>Python syntax debugging</strong>.
+        Java and C++ debugging will be added in a future version.
+    </p>
+
+    <form method="POST">
+
+        <textarea
+            name="code_to_debug"
+            rows="10"
+            placeholder="Paste Python code here to check for syntax errors..."></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            🔍 Debug Python Code
+        </button>
+
+    </form>
+
+
+    {% if debug_result %}
+
+    <h3>
+        🔎 Debug Result
+    </h3>
+
+    <pre>{{ debug_result }}</pre>
+
+    {% endif %}
+
+
+    <!-- ========================= -->
+    <!-- How It Works -->
+    <!-- ========================= -->
+
+    <hr>
+
+    <h2 id="how-it-works">
+        ⚙️ How It Works
+    </h2>
+
+    <div class="workflow">
+
+        <div class="workflow-step">
+
+            <div class="workflow-number">
+                1
+            </div>
+
+            <h3>
+                Ask a Question
+            </h3>
+
+            <p>
+                The student enters a programming problem or question.
+            </p>
+
+        </div>
+
+
+        <div class="workflow-step">
+
+            <div class="workflow-number">
+                2
+            </div>
+
+            <h3>
+                Select Language
+            </h3>
+
+            <p>
+                The student selects Python, Java or C++.
+            </p>
+
+        </div>
+
+
+        <div class="workflow-step">
+
+            <div class="workflow-number">
+                3
+            </div>
+
+            <h3>
+                Generate Code
+            </h3>
+
+            <p>
+                The application generates a suitable program.
+            </p>
+
+        </div>
+
+
+        <div class="workflow-step">
+
+            <div class="workflow-number">
+                4
+            </div>
+
+            <h3>
+                Learn &amp; Debug
+            </h3>
+
+            <p>
+                Students can explain code, debug Python syntax and generate test cases.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- About Project -->
+    <!-- ========================= -->
+
+    <hr>
+
+    <h2 id="about">
+        ℹ️ About Project
+    </h2>
+
+    <div class="about-project">
+
+        <h3>
+            🤖 AI-Powered Code Assistant for Students
+        </h3>
+
+        <p>
+            This project is designed to help students learn programming
+            by providing useful programming assistance through a simple
+            and user-friendly web application.
+        </p>
+
+        <p>
+            The application can generate programming code, explain code,
+            identify Python syntax errors, and generate basic test cases.
+            It supports code generation in Python, Java and C++.
+        </p>
+
+        <p>
+            The main goal of this project is to make programming easier
+            for beginners and help students understand programming concepts
+            through practical examples.
+        </p>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- Test Cases -->
+    <!-- ========================= -->
+
+    <hr>
+
+    <h2 id="tests">
+        🧪 Generate Test Cases
+    </h2>
+
+    <form method="POST">
+
+        <textarea
+            name="test_question"
+            rows="5"
+            placeholder="Example: Generate test cases for an even and odd program"></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            🧪 Generate Test Cases
+        </button>
+
+    </form>
+
+
+    {% if test_cases %}
+
+    <h3>
+        📋 Test Cases
+    </h3>
+
+    <pre>{{ test_cases }}</pre>
+
+    {% endif %}
+
+
+    <!-- ========================= -->
+    <!-- Recent Questions -->
+    <!-- ========================= -->
+
+    <hr>
+
+    <h2>
+        🕘 Recent Questions
+    </h2>
+
+    {% if history %}
+
+    <ul class="history-list">
+
+        {% for item in history %}
+
+        <li>
+            {{ item }}
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+
+    <form method="POST" action="/clear-history">
+
+        <button type="submit">
+            🗑️ Clear History
+        </button>
+
+    </form>
+
+
+    {% else %}
+
+    <p>
+        No recent questions.
+    </p>
+
+    {% endif %}
+
+
+</div>
+
+
+<!-- ========================= -->
+<!-- Project Footer -->
+<!-- ========================= -->
+
+<footer class="project-footer">
+
+    <h3>
+        🤖 AI-Powered Code Assistant
+    </h3>
+
+    <p>
+        A smart programming assistant for students
+    </p>
+
+    <p>
+        Supports Python, Java and C++ code generation
+    </p>
+
+    <p class="footer-credit">
+        College Project • 2026
+    </p>
+
+</footer>
+
+
+<!-- ========================= -->
+<!-- JavaScript -->
+<!-- ========================= -->
+
+<script>
+
+function copyCode() {
+
+    const code =
+        document.getElementById("generatedCode").innerText;
+
+    navigator.clipboard.writeText(code);
+
+    alert("✅ Code copied to clipboard!");
+
+}
+
+
+function copyExplanation() {
+
+    const explanation =
+        document.getElementById("explanationText").innerText;
+
+    navigator.clipboard.writeText(explanation);
+
+    alert("✅ Explanation copied to clipboard!");
+
+}
+
+
+function toggleDarkMode() {
+
+    document.body.classList.toggle("dark-mode");
+
+    if (document.body.classList.contains("dark-mode")) {
+
+        localStorage.setItem("darkMode", "enabled");
+
+    } else {
+
+        localStorage.setItem("darkMode", "disabled");
+
+    }
+
+}
+
+
+window.onload = function() {
+
+    if (localStorage.getItem("darkMode") === "enabled") {
+
+        document.body.classList.add("dark-mode");
+
+    }
+
+};
+
+function resetAll() {
+    window.location.href = "/";
+}
+
+</script>
+
+
+</body>
+
+</html>
+```
